@@ -113,11 +113,11 @@ func scrapeHandler(w http.ResponseWriter, r *http.Request) {
 	duration := time.Since(start).Seconds()
 	if err != nil {
 		if strings.Contains(fmt.Sprintf("%v", err), "unable to connect with target") {
-			mystromRequestsCounterVec.WithLabelValues(target, ERROR_SOCKET.String()).Inc()
+			mystromRequestsCounterVec.WithLabelValues(target, fmt.Sprintf("%d", ERROR_SOCKET)).Inc()
 		} else if strings.Contains(fmt.Sprintf("%v", err), "i/o timeout") {
-			mystromRequestsCounterVec.WithLabelValues(target, ERROR_TIMEOUT.String()).Inc()
+			mystromRequestsCounterVec.WithLabelValues(target, fmt.Sprintf("%d", ERROR_TIMEOUT)).Inc()
 		} else {
-			mystromRequestsCounterVec.WithLabelValues(target, ERROR_PARSING_VALUE.String()).Inc()
+			mystromRequestsCounterVec.WithLabelValues(target, fmt.Sprintf("%d", ERROR_PARSING_VALUE)).Inc()
 		}
 		http.Error(
 			w,
@@ -128,7 +128,7 @@ func scrapeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	mystromDurationCounterVec.WithLabelValues(target).Add(duration)
-	mystromRequestsCounterVec.WithLabelValues(target, OK.String()).Inc()
+	mystromRequestsCounterVec.WithLabelValues(target, fmt.Sprintf("%d", OK)).Inc()
 
 	promhttp.HandlerFor(gatherer, promhttp.HandlerOpts{}).ServeHTTP(w, r)
 }
