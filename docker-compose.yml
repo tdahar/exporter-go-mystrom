@@ -1,0 +1,26 @@
+version: '3.7'
+
+services:
+  mystrom-exporter:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    init: true
+    network_mode: 'host'
+  
+  prometheus:
+    image: prom/prometheus:latest
+    init: true
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+      - ./.prometheus:/prometheus/data
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.listen-address=${PROMETHEUS_ADDRESS:-localhost:9090}'
+      - '--storage.tsdb.retention.time=1y'
+      - '--web.enable-remote-write-receiver'
+    network_mode: 'host'
+    restart: unless-stopped
+

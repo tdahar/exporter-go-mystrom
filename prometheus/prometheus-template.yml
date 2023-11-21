@@ -1,0 +1,12 @@
+ - job_name: mystrom
+   scrape_interval: 30s
+   metrics_path: /device
+   honor_labels: true
+   static_configs:
+   - targets:
+     - '192.168.1.79'
+   relabel_configs:
+     - source_labels: [__address__]
+       target_label: __param_target
+     - target_label: __address__
+       replacement: 127.0.0.1:9452
