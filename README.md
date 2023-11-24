@@ -31,6 +31,10 @@ $ go generate ./...
 | mystrom_report_relay | The current state of the relay (wether or not the relay is currently turned on) |
 | mystrom_report_power  | The current power consumed by devices attached to the switch |
 
+This exporter receives requests with a target device (myStrom device), pings the WIFI switch and then returns metrics about this device.
+With a single exporter, one can monitor several myStrom devices as the same endpoint can be used for multiple myStrom devices.
+See below the Prometheus configuration sample.
+
 ## Flags
 ```bash
 $ ./mystrom-exporter --help
@@ -52,15 +56,15 @@ the Prometheus.
    honor_labels: true
    static_configs:
    - targets:
-     - '192.168.105.11'
+     - '192.168.105.11' # Plase your myStrom device IP here
      - '192.168.105.12'
      - '192.168.105.13'
      - '192.168.105.14'
-   relabel_configs:
-     - source_labels: [__address__]
-       target_label: __param_target
-     - target_label: __address__
-       replacement: 127.0.0.1:9452
+   relabel_configs: # Initial scrape: http://192.168.105.11/device
+     - source_labels: [__address__] # First add a new argument to the request -> example: http://192.168.105.11/device?target=192.168.105.11
+       target_label: __param_target # The same address is used for the new parameter
+     - target_label: __address__ # Now replace the endpoint address
+       replacement: 127.0.0.1:9452 # This is where the exporter listens for metrics -> http://127.0.0.1:9452/device?target=192.168.105.11
 ```
 
 ## Supported architectures
